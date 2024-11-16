@@ -1,0 +1,36 @@
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# 模拟菜单
+menu = {
+    1: {"name": "汉堡", "price": 20},
+    2: {"name": "披萨", "price": 30},
+    3: {"name": "沙拉", "price": 15}
+}
+
+# 存储订单
+orders = []
+
+@app.route('/menu', methods=['GET'])
+def get_menu():
+    return jsonify(menu)
+
+@app.route('/order', methods=['POST'])
+def place_order():
+    order_data = request.json
+    order_id = len(orders) + 1
+    order = {
+        "id": order_id,
+        "items": order_data['items'],
+        "total": sum(menu[item]['price'] for item in order_data['items'])
+    }
+    orders.append(order)
+    return jsonify(order), 201
+
+@app.route('/orders', methods=['GET'])
+def get_orders():
+    return jsonify(orders)
+
+if __name__ == '__main__':
+    app.run(debug=True)
